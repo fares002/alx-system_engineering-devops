@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+#loop thats write "Best School" 10 times
+
+n=1
+
+while [ $n -le 10 ]
+do
+       echo "Best School"
+       n=$(( n + 1))
+done
+
