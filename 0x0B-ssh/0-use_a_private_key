@@ -1,0 +1,6 @@
+#!/bin/bash
+# Add the private key to the SSH agent
+ssh-add ~/.ssh/school
+# Connect to the server using the SSH agent
+ssh ubuntu@54.157.128.148
+
