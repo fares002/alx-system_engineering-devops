@@ -1,20 +1,16 @@
-# custom_header.pp
-
-# Install Nginx package
-package { 'nginx':
+# install and configure nginx
+exec {'update':
+  command => '/usr/bin/apt-get update',
+}
+-> package { 'nginx':
   ensure => installed,
 }
-
-# Define custom HTTP header value
-$hostname = $::hostname
-
-# Configure Nginx to add custom header
-nginx::resource::vhost { 'default':
-  ensure   => present,
-  www_root => '/var/www/html',
-  proxy    => 'http://localhost:8080', # Assuming your backend application is running on localhost:8080
-  header   => {
-    'X-Served-By' => $hostname,
-  },
+-> file_line { 'header_served_by':
+  path  => '/etc/nginx/sites-available/default',
+  match => '^server {',
+  line  => "server {\n\tadd_header X-Served-By \"${hostname}\";",
+  multiple => false,
 }
-
+-> exec {'run':
+  command => '/usr/sbin/service nginx restart',
+}
