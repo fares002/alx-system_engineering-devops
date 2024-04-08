@@ -1,33 +1,48 @@
 #!/usr/bin/env bash
-#this script this for installing and confi HAProxy
-#update the system
+# Requests using a round-robin algorithm
 
-sudo apt-get -y update
-#install new server
-sudo apt-get -y install nginx
-sudo service nginx start
-sudo service nginx restart
-#configur the firewall 
-sudo ufw allow 'Nginx HTTP'
- 
+sudo apt-get install -y haproxy
 
-#dedicated PPA with the following command:
-sudo apt-get install --no-install-recommends software-properties-common
-sudo add-apt-repository ppa:vbernat/haproxy-2.0
+echo "ENABLE=1" >> /etc/default/haproxy
+mv /etc/haproxy/haproxy.cfg{,.original}
+touch /etc/haproxy/haproxy.cfg
 
-#install the HAProxy 
-sudo apt-get -y install haproxy=2.0.\*
+printf %s "global
+    log 127.0.0.1 local0 notice
+    maxconn 2000
+    user haproxy
+    group haproxy
 
-echo -e \
-"\nlisten load_balancer
-\tbind :80
-\tmode http
-\tstats enable
-\tstats uri /haproxy?stats
-\tbalance roundrobin
-\tserver 516696-web-01 54.152.134.222:80 check
-\tserver 516696-web-02 35.168.2.251:80 check" \
-    >> /etc/haproxy/haproxy.cfg
-service haproxy restart
+defaults
+    log     global
+    mode    http
+    option  httplog
+    option  dontlognull
+    retries 3
+    option  redispatch
+    timeout connect 5000
+    timeout client  30000
+    timeout server  30000
+    errorfile 400 /etc/haproxy/errors/400.http
+    errorfile 403 /etc/haproxy/errors/403.http
+    errorfile 408 /etc/haproxy/errors/408.http
+    errorfile 500 /etc/haproxy/errors/500.http
+    errorfile 502 /etc/haproxy/errors/502.http
+    errorfile 503 /etc/haproxy/errors/503.http
+    errorfile 504 /etc/haproxy/errors/504.http
 
+frontend http-in
+    timeout client 30000
+    bind 0:80
+    default_backend servers
+
+backend servers
+    timeout connect 3000
+    timeout server 30000
+    balance roundrobin
+    server 516696-web-01 54.152.134.222:80 check
+    server 516696-web-02 35.168.2.251:80 check
+" >> /etc/haproxy/haproxy.cfg
+
+sudo service haproxy restart
 
