@@ -2,7 +2,14 @@
 #this script this for installing and confi HAProxy
 #update the system
 
-sudo apt-get -y upgrade 
+sudo apt-get -y update
+#install new server
+sudo apt-get -y install nginx
+sudo service nginx start
+sudo service nginx restart
+#configur the firewall 
+sudo ufw allow 'Nginx HTTP'
+ 
 
 #dedicated PPA with the following command:
 sudo apt-get install --no-install-recommends software-properties-common
