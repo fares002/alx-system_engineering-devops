@@ -1,0 +1,19 @@
+#update the system
+sudo apt-get update
+
+#install the firewall if not already installed
+sudo apt-get install -y ufw
+
+#deny all the incoming
+sudo ufw default deny incoming
+
+#allow all the outgoing
+sudo ufw defult allow outgoing
+
+#allow the 80, 22, 443 for ssh, HTTP, HTTPS 
+sudo ufw allow 22/tcp
+sudo ufw allow 80/tcp
+sudo ufw allow 443/tcp
+
+#enable the uncomplicated firewall
+sudo ufw enable
