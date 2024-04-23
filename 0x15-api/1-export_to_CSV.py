@@ -11,12 +11,14 @@ if __name__ == "__main__":
     employee_id = sys.argv[1]
     file_name = employee_id + ".csv"
     url = 'https://jsonplaceholder.typicode.com/'
-    employee_response = requests.get(url+f"{employee_id}").json()
     toDo_response = requests.get(url+f"users/{employee_id}/todos").json()
     employee = requests.get(url+f"/users/{employee_id}").json()
     employee_name = employee.get("name")
 
     with open(file_name, "w") as file:
         for todo in toDo_response:
-            file.write(f'"{employee_id},"{employee_name}",\
-                    "{todo.get("completed")}","{todo.get("title")}"\n')
+            task_completed = todo.get("completed")
+            task_title = todo.get("title")
+            line = f'"{employee_id}","{employee_name}",'
+            line2 = f'{line}"{task_completed}","{task_title}"\n' 
+            file.write(line2)
