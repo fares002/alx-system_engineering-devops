@@ -1,24 +1,27 @@
 #!/usr/bin/python3
-"""
-Return:
-Records all tasks that are owned by this employee
-Format must be: "USER_ID","USERNAME","TASK_COMPLETED_STATUS","TASK_TITLE
-"""
-import requests
-import sys
+'''
+For a given employee ID, returns information about his/her
+TODO list progress in CSV format.
+'''
 
-if __name__ == "__main__":
-    employee_id = sys.argv[1]
-    file_name = employee_id + ".csv"
-    url = 'https://jsonplaceholder.typicode.com/'
-    toDo_response = requests.get(url+f"users/{employee_id}/todos").json()
-    employee = requests.get(url+f"/users/{employee_id}").json()
-    employee_name = employee.get("name")
+if __name__ == '__main__':
+    import csv
+    import requests
+    import sys
 
-    with open(file_name, "w") as file:
-        for todo in toDo_response:
-            task_completed = todo.get("completed")
-            task_title = todo.get("title")
-            line = f'"{employee_id}","{employee_name}",'
-            line2 = f'{line}"{task_completed}","{task_title}"\n'
-            file.write(line2)
+    NUMBER_OF_DONE_TASKS = 0
+    TASK_TITLE = []
+    USER_ID = sys.argv[1]
+    user = requests.get('https://jsonplaceholder.typicode.com/users/{}'.
+                        format(USER_ID))
+    name = user.json()
+
+    req = requests.get('https://jsonplaceholder.typicode.com/todos?userId={}'.
+                       format(USER_ID))
+    todos = req.json()
+
+    with open(USER_ID + '.csv', 'w', newline='') as csv_file:
+        write = csv.writer(csv_file, quoting=csv.QUOTE_ALL)
+        for item in todos:
+            write.writerow([name['id'], name['username'],
+                            item['completed'], item['title']])
