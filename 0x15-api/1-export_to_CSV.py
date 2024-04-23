@@ -20,5 +20,5 @@ if __name__ == "__main__":
             task_completed = todo.get("completed")
             task_title = todo.get("title")
             line = f'"{employee_id}","{employee_name}",'
-            line2 = f'{line}"{task_completed}","{task_title}"\n' 
+            line2 = f'{line}"{task_completed}","{task_title}"\n'
             file.write(line2)
