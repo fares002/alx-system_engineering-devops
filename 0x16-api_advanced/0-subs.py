@@ -1,17 +1,27 @@
-#!/usr/bin/pyithon3
-"""queries the Reddit API and returns the number of subscribers """
-
+#!/usr/bin/python3
+"""This script will return the number of subscribers associated with
+a subreddit
+"""
 import requests
+from sys import argv
+
 
 def number_of_subscribers(subreddit):
-    """t queries the Reddit API and returns
-    the number of subscribers """
-    url = f"https://www.reddit.com/r/{subreddit}/about.json"
-    headers = {'User-Agent': 'Mozilla/5.0'}
-    response = requests.get(url, headers=headers)
+    """Method get the number of users subscribed to a subreddit
 
-    if response.status_code == 200:
-        data = response.json()
-        return data['data']['subscribers']
-    else:
+    subreddit (Str)- subreddit to check
+
+    Returns - number of users (INT) else 0 (INT) if not subreddit is found
+    """
+    try:
+        h = {'user-agent': 'Mozilla/5.0', 'allow_redirects': 'false'}
+        url = "https://www.reddit.com/r/{}/about.json".format(subreddit)
+        req = requests.get(url, headers=h)
+        return req.json().get('data').get('subscribers', 0)
+    except Exception as e:
         return 0
+
+
+if __name__ == "__main__":
+    pass
+
