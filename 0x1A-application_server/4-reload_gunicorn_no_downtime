@@ -1,6 +1,14 @@
 #!/usr/bin/env bash
 # Gracefully reloads Gunicorn.
 
+# Check for required commands
+for cmd in pgrep kill; do
+    if ! command -v "$cmd" &> /dev/null; then
+        echo "Error: $cmd command not found."
+        exit 1
+    fi
+done
+
 # Find Gunicorn process IDs
 gunicorn_pids=$(pgrep gunicorn)
 
@@ -17,7 +25,14 @@ done
 
 # Wait for old workers to finish processing
 echo "Waiting for old workers to finish processing..."
-sleep 5
+for i in {1..5}; do
+    if ! pgrep gunicorn &> /dev/null; then
+        echo "All Gunicorn processes have stopped."
+        echo "Graceful reload complete."
+        exit 0
+    fi
+    sleep 1
+done
 
-echo "Graceful reload complete"
+echo "Some Gunicorn processes are still running. Graceful reload complete."
 
